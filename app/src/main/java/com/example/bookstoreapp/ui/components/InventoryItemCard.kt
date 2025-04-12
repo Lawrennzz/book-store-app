@@ -8,6 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.bookstoreapp.data.InventoryItem
+import java.text.NumberFormat
+import java.util.*
+
+private const val LOW_STOCK_THRESHOLD = 5
+
+fun InventoryItem.formattedPrice(): String {
+    return NumberFormat.getCurrencyInstance(Locale.getDefault()).format(price)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +47,7 @@ fun InventoryItemCard(
                 )
                 LowStockBadge(
                     quantity = item.quantity,
-                    threshold = InventoryItem.LOW_STOCK_THRESHOLD
+                    threshold = LOW_STOCK_THRESHOLD
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
