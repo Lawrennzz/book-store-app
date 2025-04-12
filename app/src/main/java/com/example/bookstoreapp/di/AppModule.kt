@@ -3,8 +3,7 @@ package com.example.bookstoreapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.bookstoreapp.data.AppDatabase
-import com.example.bookstoreapp.data.BookDao
-import com.example.bookstoreapp.data.OrderDao
+import com.example.bookstoreapp.data.InventoryItemDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,8 +13,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DatabaseModule {
-    
+object AppModule {
+
     @Provides
     @Singleton
     fun provideAppDatabase(
@@ -24,17 +23,15 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "bookstore.db"
+            AppDatabase.DATABASE_NAME
         ).build()
     }
 
     @Provides
-    fun provideBookDao(database: AppDatabase): BookDao {
-        return database.bookDao()
-    }
-
-    @Provides
-    fun provideOrderDao(database: AppDatabase): OrderDao {
-        return database.orderDao()
+    @Singleton
+    fun provideInventoryItemDao(
+        database: AppDatabase
+    ): InventoryItemDao {
+        return database.inventoryItemDao()
     }
 } 
