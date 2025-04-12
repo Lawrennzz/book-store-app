@@ -13,24 +13,32 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.bookstoreapp.viewmodel.BookListViewModel
+import com.example.bookstoreapp.viewmodel.BookViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: BookListViewModel
+    viewModel: BookViewModel = hiltViewModel()
 ) {
+    val books by viewModel.books.collectAsState(initial = emptyList())
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
         Text(
-            text = "Book Store",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 32.dp),
-            textAlign = TextAlign.Center
+            text = "Welcome to BookStore",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        Text(
+            text = "Total Books: ${books.size}",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
         // All Books Card

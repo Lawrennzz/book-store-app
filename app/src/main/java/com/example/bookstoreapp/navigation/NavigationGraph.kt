@@ -45,13 +45,15 @@ fun NavigationGraph(
             val viewModel = hiltViewModel<AddBookViewModel>()
             AddBookScreen(navController, viewModel)
         }
-        composable(
-            route = Screen.EditBook.route,
-            arguments = Screen.EditBook.arguments
-        ) { backStackEntry ->
-            val bookId = backStackEntry.arguments?.getString("bookId") ?: return@composable
-            val viewModel = hiltViewModel<EditBookViewModel>()
-            EditBookScreen(navController, viewModel)
+        composable(Screen.EditBook.route) { backStackEntry ->
+            val bookId = backStackEntry.arguments?.getString("bookId")
+            if (bookId == null) {
+                // Handle error case
+                return@composable
+            }
+            val viewModel: EditBookViewModel = hiltViewModel()
+            viewModel.loadBook(bookId)
+            EditBookScreen(navController = navController, viewModel = viewModel)
         }
         composable(
             route = Screen.OrderConfirmation.route,
