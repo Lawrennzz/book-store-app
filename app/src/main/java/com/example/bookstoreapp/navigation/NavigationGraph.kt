@@ -27,26 +27,31 @@ fun NavigationGraph(
         startDestination = Screen.Home.route
     ) {
         composable(Screen.Home.route) {
-            HomeScreen(navController)
+            val viewModel = hiltViewModel<BookListViewModel>()
+            HomeScreen(navController, viewModel)
         }
         composable(Screen.AllBooks.route) {
-            AllBooksScreen(navController)
+            val viewModel = hiltViewModel<BookListViewModel>()
+            AllBooksScreen(navController, viewModel)
         }
         composable(Screen.Inventory.route) {
-            InventoryScreen(navController)
+            val viewModel = hiltViewModel<BookListViewModel>()
+            InventoryScreen(navController, viewModel)
         }
         composable(Screen.Orders.route) {
             OrdersScreen(navController)
         }
         composable(Screen.AddBook.route) {
-            AddBookScreen(navController)
+            val viewModel = hiltViewModel<AddBookViewModel>()
+            AddBookScreen(navController, viewModel)
         }
         composable(
             route = Screen.EditBook.route,
             arguments = Screen.EditBook.arguments
         ) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId") ?: return@composable
-            EditBookScreen(navController, bookId)
+            val viewModel = hiltViewModel<EditBookViewModel>()
+            EditBookScreen(navController, viewModel)
         }
         composable(
             route = Screen.OrderConfirmation.route,
