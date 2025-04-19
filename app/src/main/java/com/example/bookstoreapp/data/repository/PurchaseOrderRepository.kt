@@ -66,8 +66,9 @@ class PurchaseOrderRepository(
             }
             
             // Update order status based on all items being received
-            val items = purchaseOrderItemDao.getItemsForOrder(orderId)
-            // Check if all items are fully received in a separate coroutine call
+            // TODO: Implement logic to check if all items are received and update order status
+            // For future implementation: Use orderItems to verify receipt status
+            // val orderItems = purchaseOrderItemDao.getItemsForOrder(orderId)
         }
     }
     

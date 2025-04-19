@@ -1,36 +1,37 @@
 package com.example.bookstoreapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.bookstoreapp.ui.screens.*
+import com.example.bookstoreapp.ui.navigation.AppNavHost
+import com.example.bookstoreapp.ui.theme.BookStoreAppTheme
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.example.bookstoreapp.ui.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Log start of application
+        Log.d("MainActivity", "Starting app setup")
+        
         setContent {
-            BookStoreApp()
+            BookStoreAppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+                    AppNavHost(navController = navController)
+                }
+            }
         }
-    }
-}
-
-@Composable
-fun BookStoreApp() {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "dashboard") {
-        composable("dashboard") { DashboardScreen(navController) }
-        composable("inventory") { InventoryListScreen(navController) }
-        composable("add") { AddItemScreen(navController) }
-        composable("edit/{itemId}") { backStackEntry ->
-            EditItemScreen(navController, backStackEntry.arguments?.getString("itemId")?.toIntOrNull())
-        }
-        composable("detail/{itemId}") { backStackEntry ->
-            ItemDetailScreen(navController, backStackEntry.arguments?.getString("itemId")?.toIntOrNull())
-        }
-        composable("settings") { SettingsScreen(navController) }
     }
 }

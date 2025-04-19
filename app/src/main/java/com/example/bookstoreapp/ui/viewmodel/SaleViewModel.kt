@@ -145,7 +145,8 @@ class SaleViewModel(
                 )
             }
             
-            val saleId = saleRepository.createSaleWithItems(sale, saleItems)
+            // Store the created sale and update cart
+            saleRepository.createSaleWithItems(sale, saleItems)
             
             // Add loyalty points if customer exists
             if (customerId != null) {

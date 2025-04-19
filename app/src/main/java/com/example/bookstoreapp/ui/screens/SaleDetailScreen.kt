@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material3.*
@@ -19,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bookstoreapp.data.entity.SaleItem
 import com.example.bookstoreapp.ui.viewmodel.BookViewModel
-import com.example.bookstoreapp.ui.viewmodel.CustomerViewModel
 import com.example.bookstoreapp.ui.viewmodel.SaleViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,8 +30,7 @@ fun SaleDetailScreen(
     saleId: Int,
     onBack: () -> Unit,
     saleViewModel: SaleViewModel = viewModel(),
-    bookViewModel: BookViewModel = viewModel(),
-    customerViewModel: CustomerViewModel = viewModel()
+    bookViewModel: BookViewModel = viewModel()
 ) {
     val sale by saleViewModel.currentSale.collectAsState()
     val saleItems by saleViewModel.currentSaleItems.collectAsState()
@@ -46,7 +45,7 @@ fun SaleDetailScreen(
                 title = { Text("Sale Details") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -178,7 +177,7 @@ fun SaleDetailScreen(
                 ) {
                     items(saleItems) { item ->
                         SaleItemRow(item = item, bookViewModel = bookViewModel)
-                        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
                 
@@ -228,7 +227,7 @@ fun SaleDetailScreen(
                         }
                     }
                     
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         color = MaterialTheme.colorScheme.outline
                     )

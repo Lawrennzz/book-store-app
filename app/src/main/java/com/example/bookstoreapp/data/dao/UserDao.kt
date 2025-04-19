@@ -27,7 +27,19 @@ interface UserDao {
     
     @Delete
     suspend fun deleteUser(user: User)
-    
-    @Query("SELECT * FROM users WHERE username = :username AND password = :hashedPassword LIMIT 1")
-    suspend fun authenticateUser(username: String, hashedPassword: String): User?
+
+    @Query("UPDATE users SET password = :hashedPassword WHERE username = :username")
+    suspend fun updateUserPassword(username: String, hashedPassword: String)
+
+    @Query("UPDATE users SET role = :newRole WHERE username = :username")
+    suspend fun updateUserRole(username: String, newRole: UserRole)
+
+    @Query("SELECT * FROM users WHERE isActive = 1")
+    fun getActiveUsers(): Flow<List<User>>
+
+    @Query("SELECT * FROM users WHERE isActive = 0")
+    fun getInactiveUsers(): Flow<List<User>>
+
+    @Query("SELECT COUNT(*) FROM users WHERE isActive = 0")
+    suspend fun countInactiveUsers(): Int
 } 

@@ -5,14 +5,15 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,8 +38,18 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text("Bookstore Manager") },
                 actions = {
+                    if (currentUser?.role == UserRole.ADMIN) {
+                        IconButton(
+                            onClick = { onNavigate(Screen.UserManagement.route) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ManageAccounts,
+                                contentDescription = "User Management"
+                            )
+                        }
+                    }
                     IconButton(onClick = onLogout) {
-                        Icon(Icons.Filled.Logout, contentDescription = "Logout")
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")
                     }
                 }
             )
@@ -56,12 +67,39 @@ fun HomeScreen(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
             
+            if (currentUser?.role == UserRole.ADMIN) {
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "You have pending user approvals",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        FilledTonalButton(
+                            onClick = { onNavigate(Screen.UserManagement.route) }
+                        ) {
+                            Text("Review Users")
+                        }
+                    }
+                }
+            }
+            
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(getAvailableMenuItems(authViewModel)) { item ->
+                val menuItems = getAvailableMenuItems(authViewModel)
+                items(menuItems) { item ->
                     MenuCard(
                         icon = item.icon,
                         title = item.title,
@@ -76,7 +114,7 @@ fun HomeScreen(
 private fun getAvailableMenuItems(authViewModel: AuthViewModel): List<MenuItem> {
     val allItems = listOf(
         MenuItem(
-            icon = Icons.Filled.MenuBook,
+            icon = Icons.AutoMirrored.Filled.MenuBook,
             title = "Books",
             route = Screen.BookList.route,
             requiredRole = UserRole.STAFF
@@ -96,7 +134,7 @@ private fun getAvailableMenuItems(authViewModel: AuthViewModel): List<MenuItem> 
         MenuItem(
             icon = Icons.Filled.Business,
             title = "Suppliers",
-            route = Screen.SupplierList.route, 
+            route = Screen.SupplierList.route,
             requiredRole = UserRole.MANAGER
         ),
         MenuItem(
@@ -110,6 +148,12 @@ private fun getAvailableMenuItems(authViewModel: AuthViewModel): List<MenuItem> 
             title = "Reports",
             route = Screen.Reports.route,
             requiredRole = UserRole.MANAGER
+        ),
+        MenuItem(
+            icon = Icons.Filled.ManageAccounts,
+            title = "User Management",
+            route = Screen.UserManagement.route,
+            requiredRole = UserRole.ADMIN
         )
     )
     
@@ -125,14 +169,15 @@ private fun MenuCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
+                .fillMaxSize()
                 .padding(16.dp)
         ) {
             Icon(

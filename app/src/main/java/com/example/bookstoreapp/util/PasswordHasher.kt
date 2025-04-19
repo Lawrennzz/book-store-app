@@ -1,38 +1,111 @@
 package com.example.bookstoreapp.util
 
-import java.security.MessageDigest
+import android.util.Log
 import java.security.SecureRandom
+import java.security.spec.KeySpec
 import java.util.Base64
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 object PasswordHasher {
+    private const val ALGORITHM = "PBKDF2WithHmacSHA1"
+    private const val ITERATIONS = 65536
+    private const val KEY_LENGTH = 128
     private const val SALT_LENGTH = 16
-    
+    private const val TAG = "PasswordHasher"
+
     fun hashPassword(password: String): String {
-        // In a real app, you should use a proper password hashing algorithm
-        // such as bcrypt, Argon2, or PBKDF2. This is a simple SHA-256 example.
-        val salt = generateSalt()
-        val saltedPassword = password + salt
-        
-        val md = MessageDigest.getInstance("SHA-256")
-        val hash = md.digest(saltedPassword.toByteArray())
-        
-        val saltEncoded = Base64.getEncoder().encodeToString(salt)
-        val hashEncoded = Base64.getEncoder().encodeToString(hash)
-        
-        return "$saltEncoded:$hashEncoded"
+        try {
+            if (password.isBlank()) {
+                Log.e(TAG, "Cannot hash empty password")
+                throw IllegalArgumentException("Password cannot be empty")
+            }
+            
+            val random = SecureRandom()
+            val salt = ByteArray(SALT_LENGTH)
+            random.nextBytes(salt)
+
+            val spec: KeySpec = PBEKeySpec(
+                password.toCharArray(),
+                salt,
+                ITERATIONS,
+                KEY_LENGTH
+            )
+            
+            // Ensure SecretKeyFactory is available
+            val factory = try {
+                SecretKeyFactory.getInstance(ALGORITHM)
+            } catch (e: Exception) {
+                Log.e(TAG, "Algorithm $ALGORITHM not available", e)
+                throw RuntimeException("Password hashing algorithm not available", e)
+            }
+            
+            val hash = factory.generateSecret(spec).encoded
+
+            // Combine salt and hash with a delimiter
+            val saltString = Base64.getEncoder().encodeToString(salt)
+            val hashString = Base64.getEncoder().encodeToString(hash)
+            
+            // Verify the hash format
+            val finalHash = "$saltString:$hashString"
+            if (!finalHash.contains(":")) {
+                Log.e(TAG, "Generated hash does not contain delimiter")
+                throw RuntimeException("Generated invalid hash format")
+            }
+            
+            Log.d(TAG, "Successfully hashed password")
+            return finalHash
+        } catch (e: Exception) {
+            Log.e(TAG, "Error hashing password", e)
+            throw RuntimeException("Error hashing password", e)
+        }
     }
-    
-    private fun generateSalt(): ByteArray {
-        val random = SecureRandom()
-        val salt = ByteArray(SALT_LENGTH)
-        random.nextBytes(salt)
-        return salt
-    }
-    
-    fun verifyPassword(storedHash: String, password: String): Boolean {
-        // This is a simplified example
-        // In a real app, you would extract the salt from the stored hash
-        // and hash the provided password with that salt
-        return storedHash == hashPassword(password)
+
+    fun verifyPassword(password: String, storedHash: String): Boolean {
+        try {
+            // Handle edge cases
+            if (password.isBlank()) {
+                Log.e(TAG, "Attempted to verify empty password")
+                return false
+            }
+            
+            if (storedHash.isBlank()) {
+                Log.e(TAG, "Stored hash is empty")
+                return false
+            }
+            
+            // Check hash format
+            val parts = storedHash.split(":")
+            if (parts.size != 2) {
+                Log.e(TAG, "Invalid hash format: $storedHash")
+                // For fallback compatibility, check if unhashed password matches
+                return password == storedHash
+            }
+
+            try {
+                val salt = Base64.getDecoder().decode(parts[0])
+                val hash = Base64.getDecoder().decode(parts[1])
+
+                val spec: KeySpec = PBEKeySpec(
+                    password.toCharArray(),
+                    salt,
+                    ITERATIONS,
+                    KEY_LENGTH
+                )
+                val factory = SecretKeyFactory.getInstance(ALGORITHM)
+                val testHash = factory.generateSecret(spec).encoded
+
+                val result = hash.contentEquals(testHash)
+                Log.d(TAG, "Password verification result: $result")
+                return result
+            } catch (e: IllegalArgumentException) {
+                // Handle Base64 decoding errors
+                Log.e(TAG, "Invalid Base64 in stored hash", e)
+                return false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error verifying password", e)
+            return false
+        }
     }
 } 

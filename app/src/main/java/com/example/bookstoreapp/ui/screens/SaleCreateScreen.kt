@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Remove
@@ -34,7 +35,6 @@ fun SaleCreateScreen(
     customerViewModel: CustomerViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel()
 ) {
-    val books by bookViewModel.books.collectAsState()
     val cartItems by saleViewModel.cartItems.collectAsState()
     val cartTotal by saleViewModel.cartTotal.collectAsState()
     val currentUser by authViewModel.currentUser.collectAsState()
@@ -62,7 +62,7 @@ fun SaleCreateScreen(
                             onCancel()
                         }
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -634,7 +634,7 @@ fun PaymentDialog(
                         color = MaterialTheme.colorScheme.error
                     )
                     
-                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     
                     Text(
                         text = "Final Amount: $${String.format("%.2f", finalAmount)}",
